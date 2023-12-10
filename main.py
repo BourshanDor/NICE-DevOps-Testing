@@ -48,21 +48,21 @@ def invoke_lambda_function(lambda_function_name, payload):
 
 
 def main() : 
-    delete_all_objects(BUCKET_NAME)
-    os.makedirs(output_directory, exist_ok=True)
+    # delete_all_objects(BUCKET_NAME)
+    # os.makedirs(output_directory, exist_ok=True)
 
-    # Loop to create 1001 text files
-    for n in range(1, 1002):
-        file_name = f'{output_directory}/{n}'
+    # # Loop to create 1001 text files
+    # for n in range(1, 1002):
+    #     file_name = f'{output_directory}/{n}'
         
-        # Create and write content to the file
-        with open(file_name, 'w') as file:
-            file.write(f'This is file number {n}')
+    #     # Create and write content to the file
+    #     with open(file_name, 'w') as file:
+    #         file.write(f'This is file number {n}')
 
-        s3_file_path = os.path.basename(file_name)
+    #     s3_file_path = os.path.basename(file_name)
 
-        with open(file_name, 'r') as file:
-            upload_to_s3(file_name, BUCKET_NAME, s3_file_path)
+    #     with open(file_name, 'r') as file:
+    #         upload_to_s3(file_name, BUCKET_NAME, s3_file_path)
 
 
         
@@ -70,13 +70,14 @@ def main() :
 
   
     response = invoke_lambda_function(FUNCTION_NAME, json.dumps({}))
-    
-    files_name_list = response['body']
-    files_name_list = files_name_list.sort()
-    order_list = [str(i) for i in range(1,1002)]
-    order_list = order_list.sort()
+    status_code = response['statusCode']
+    if status_code == 200 : 
+        files_name_list = response['body']
+        files_name_list = files_name_list.sort()
+        order_list = [str(i) for i in range(1,1002)]
+        order_list = order_list.sort()
 
-    if order_list != files_name_list : 
+    if status_code != 200 or order_list != files_name_list : 
         print('The test fail')
     else : 
         print('The test success')
