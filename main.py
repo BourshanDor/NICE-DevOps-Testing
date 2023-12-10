@@ -63,7 +63,7 @@ def main() :
 
         with open(file_name, 'r') as file:
             upload_to_s3(file_name, BUCKET_NAME, s3_file_path)
-        print(f' {n} ')
+
 
         
     print(f'Files created successfully in the {output_directory} directory.')
