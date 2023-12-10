@@ -22,6 +22,7 @@ def upload_to_s3(local_file_path, bucket_name, s3_file_path):
         print("Credentials not available")
 
 def delete_all_objects(bucket_name):
+    # Create an S3 client
     s3 = boto3.resource('s3')
     bucket = s3.Bucket(bucket_name)
 
@@ -29,18 +30,22 @@ def delete_all_objects(bucket_name):
         obj.delete()
 
 def invoke_lambda_function(lambda_function_name, payload):
-   
+   # Create an lambda client
     lambda_client = boto3.client('lambda')
+    try : 
+        response = lambda_client.invoke(
+            FunctionName=lambda_function_name,
+            InvocationType='RequestResponse', 
+            Payload=payload
+        )
+        #Lambda function returns JSON
+        response_payload =  json.loads(response['Payload'].read().decode('utf-8'))
+        return response_payload
+    
+    except Exception as e:
+        print(f"Error invoking Lambda function: {e}")
 
-    response = lambda_client.invoke(
-        FunctionName=lambda_function_name,
-        InvocationType='RequestResponse',  # Us
-        Payload=payload
-    )
 
-    #Lambda function returns JSON
-    response_payload = response['Payload'].read().decode('utf-8')
-    return response_payload
 
 def main() : 
     delete_all_objects(BUCKET_NAME)
@@ -63,34 +68,20 @@ def main() :
         
     print(f'Files created successfully in the {output_directory} directory.')
 
-    lambda_client = boto3.client('lambda')
-    payload = {}
-    payload_json = json.dumps(payload)
+  
+    response = invoke_lambda_function(FUNCTION_NAME, json.dumps({}))
+    
+    files_name_list = response['body']
+    files_name_list = files_name_list.sort()
+    order_list = [str(i) for i in range(1,1002)]
+    order_list = order_list.sort()
 
-    try:
-        # Invoke the Lambda function
-        response = lambda_client.invoke(
-            FunctionName=FUNCTION_NAME,
-            InvocationType='RequestResponse', 
-            Payload=payload_json
-        )
-
-        # Read the response from the Lambda function
-        response_payload = json.loads(response['Payload'].read().decode('utf-8'))
-
-        files_name_list = response_payload['body']
-        files_name_list = files_name_list.sort()
-        order_list = [str(i) for i in range(1,1002)]
-        order_list = order_list.sort()
-
-        if order_list != files_name_list : 
-            print('The test fail')
-        else : 
-            print('The test success')
+    if order_list != files_name_list : 
+        print('The test fail')
+    else : 
+        print('The test success')
 
 
-    except Exception as e:
-        print(f"Error invoking Lambda function: {e}")
     
 if __name__ == '__main__' : 
     main()
