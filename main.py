@@ -86,7 +86,7 @@ def main() :
         if order_list != files_name_list : 
             print('The test fail')
         else : 
-            print('The test fail')
+            print('The test success')
 
 
     except Exception as e:
