@@ -48,21 +48,21 @@ def invoke_lambda_function(lambda_function_name, payload):
 
 
 def main() : 
-    # delete_all_objects(BUCKET_NAME)
-    # os.makedirs(output_directory, exist_ok=True)
+    delete_all_objects(BUCKET_NAME)
+    os.makedirs(output_directory, exist_ok=True)
 
-    # # Loop to create 1001 text files
-    # for n in range(1, 1002):
-    #     file_name = f'{output_directory}/{n}'
+    # Loop to create 1001 text files
+    for n in range(1, 1002):
+        file_name = f'{output_directory}/{n}'
         
-    #     # Create and write content to the file
-    #     with open(file_name, 'w') as file:
-    #         file.write(f'This is file number {n}')
+        # Create and write content to the file
+        with open(file_name, 'w') as file:
+            file.write(f'This is file number {n}')
 
-    #     s3_file_path = os.path.basename(file_name)
+        s3_file_path = os.path.basename(file_name)
 
-    #     with open(file_name, 'r') as file:
-    #         upload_to_s3(file_name, BUCKET_NAME, s3_file_path)
+        with open(file_name, 'r') as file:
+            upload_to_s3(file_name, BUCKET_NAME, s3_file_path)
 
 
         
